@@ -177,3 +177,58 @@ def colorDifferences(color1_RGB, color2_RGB):
         print("TypeError: Use only numerical and positive values in 3-size tuple.")
         ValueError       
         
+        
+ # --- Create the Colorblind dataframe --- #         
+        
+def computeColorblind(df_colors, colors_column, transform_type):
+    '''Goal : Use the getNewColor() function on the color dataframe to reconstruct new dataframe color for colorblind.
+       It return the same dataframe with new colors
+       
+       Set transform_type to '1' for protanopia's vision transformation, '2' for deuteranopia's vision, '3' for tritanopia's vision, '0' for no transform.
+       
+       Input: Pandas dataframe - Initial colors
+       Output: Pandas dataframe - Transformed colors'''
+    
+    df = df_colors.copy(deep=True)
+    
+    df[colors_column] = [getNewColor(x,transform_type) for x in list(df_colors[colors_column])]
+    
+    return df
+
+        
+# --- Compute average color comprehensibility --- #        
+        
+def colorComprehensibility(df_colors, colors_column, analysis_type):
+    '''Goal: Compute the distance between colors
+       3 types of analysis are possible: 
+            - 'average' to compute the average distance between colors
+            - 'averagePond' to compute the average distance between colors pod
+            - 'minDiff'to find the minimum difference between two colors
+    Input: Pandas dataframe - RGB colors
+    Output: value - agregated color comprehensibility'''
+    
+    try:
+        #prevent crash if the analysis_type is wrong
+        ['average','averagePond','minDiff'].index(analysis_type)
+        
+        if analysis_type == 'average':
+            out = np.mean([colorDifferences(x,y) for i,x in enumerate(df_colors[colors_column].tolist()) for j,y in enumerate(df_colors[colors_column].tolist()) if j>i])
+        if analysis_type == 'averagePond':
+            out = np.mean([colorDifferences(x,y) * (df_colors.iloc[i,2]/100 + df_colors.iloc[j,2]/100) for i,x in enumerate(df_colors[colors_column].tolist()) for j,y in enumerate(df_colors[colors_column].tolist()) if j>i])
+        if analysis_type == 'minDiff':
+            out = np.min([colorDifferences(x,y) for i,x in enumerate(df_colors[colors_column].tolist()) for j,y in enumerate(df_colors[colors_column].tolist()) if j>i])
+    
+        return out
+
+    except ValueError:
+        print("ValueError: Use one of the following possibility as a analysis_type : 'average', 'averagePond','minDiff'.")
+    except TypeError:
+        print("TypeError: df_colors must be a pandas dataframe, generated from the getMostCommonColor() function.")
+    except KeyError:
+        print("KeyError: invalid column name")
+        
+
+
+        
+        
+        
