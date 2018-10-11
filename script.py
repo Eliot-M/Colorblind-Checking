@@ -200,10 +200,11 @@ def computeColorblind(df_colors, colors_column, transform_type):
         
 def colorComprehensibility(df_colors, colors_column, analysis_type):
     '''Goal: Compute the distance between colors
-       3 types of analysis are possible: 
-            - 'average' to compute the average distance between colors
-            - 'averagePond' to compute the average distance between colors pod
-            - 'minDiff'to find the minimum difference between two colors
+       
+       Set analysis_type to 'average' to compute the average distance between colors.
+        To 'averagePond' to compute the average distance between colors including with size ponderation
+        To 'minDiff' to find the maximum difference between two colors. 
+        
     Input: Pandas dataframe - RGB colors
     Output: value - agregated color comprehensibility'''
     
@@ -216,7 +217,7 @@ def colorComprehensibility(df_colors, colors_column, analysis_type):
         if analysis_type == 'averagePond':
             out = np.mean([colorDifferences(x,y) * (df_colors.iloc[i,2]/100 + df_colors.iloc[j,2]/100) for i,x in enumerate(df_colors[colors_column].tolist()) for j,y in enumerate(df_colors[colors_column].tolist()) if j>i])
         if analysis_type == 'minDiff':
-            out = np.min([colorDifferences(x,y) for i,x in enumerate(df_colors[colors_column].tolist()) for j,y in enumerate(df_colors[colors_column].tolist()) if j>i])
+            out = np.max([colorDifferences(x,y) for i,x in enumerate(df_colors[colors_column].tolist()) for j,y in enumerate(df_colors[colors_column].tolist()) if j>i])
     
         return out
 
